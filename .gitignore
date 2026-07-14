@@ -16,6 +16,10 @@ dist-ssr
 src-tauri/target
 src-tauri/gen
 
+# Local-only Cargo overrides (e.g. a machine-specific build-cache target-dir) — must not ship,
+# they break CI and other clones.
+src-tauri/.cargo/config.toml
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
