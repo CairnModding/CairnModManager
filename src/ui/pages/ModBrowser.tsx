@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Panel } from "../primitives/Panel";
 import { Field } from "../primitives/Field";
+import { Select } from "../primitives/Select";
 import { ModCard } from "../components/ModCard";
 import { ModDetailModal } from "../components/ModDetailModal";
 import { ProgressMeter } from "../components/ProgressMeter";
@@ -12,12 +13,16 @@ import { useInstallStore } from "../../state/installStore";
 import { useDownloadHistoryStore } from "../../state/downloadHistoryStore";
 import { useAsyncAction } from "../../hooks/useAsyncAction";
 import { findInstalled } from "../../domain/installedMod";
+import { MOD_SORT_OPTIONS, sortMods, type ModSortKey } from "../../domain/sortMods";
 import { logAppError } from "../../state/appLogStore";
+import "./modBrowser.css";
 
 export function ModBrowser() {
   const container = useContainer();
   const [query, setQuery] = useState("");
+  const [sortKey, setSortKey] = useState<ModSortKey>("updated");
   const { data: mods, isLoading, error } = useModSearch("nexus", query);
+  const sortedMods = mods ? sortMods(mods, sortKey) : undefined;
   const { profile, load, setProfile, save } = useProfileStore();
   const { settings } = useSettingsStore();
   const { tasks } = useInstallStore();
@@ -100,12 +105,25 @@ export function ModBrowser() {
   return (
     <div className="cm-page">
       <Panel title="Browse mods (Nexus)">
-        <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <div className="cm-browser__controls">
+          <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <Select
+            label="Sort by"
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value as ModSortKey)}
+          >
+            {MOD_SORT_OPTIONS.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+        </div>
         {activeEvent && <ProgressMeter event={activeEvent} />}
         {isLoading && <p>Loading…</p>}
       </Panel>
       <Panel fill>
-        {mods?.map((mod) => (
+        {sortedMods?.map((mod) => (
           <ModCard
             key={mod.ref.id}
             mod={mod}

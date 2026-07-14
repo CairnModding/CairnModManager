@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { InstalledMod } from "../../domain/installedMod";
+import type { AvailableUpdate } from "../../domain/computeUpdateSet";
 import type { CfgDocument } from "../../domain/melonPreferences";
 import { Modal } from "../primitives/Modal";
 import { Button } from "../primitives/Button";
@@ -10,21 +11,25 @@ import "./components.css";
 
 export function InstalledModDetailModal({
   mod,
+  update,
   gameDir,
   busy,
   disabled,
   disabledReason,
   onToggleEnabled,
   onUninstall,
+  onUpdate,
   onClose,
 }: {
   mod: InstalledMod | undefined;
+  update?: AvailableUpdate;
   gameDir: string | undefined;
   busy: boolean;
   disabled: boolean;
   disabledReason?: string;
   onToggleEnabled: () => void;
   onUninstall: () => void;
+  onUpdate: () => void;
   onClose: () => void;
 }) {
   const container = useContainer();
@@ -50,6 +55,16 @@ export function InstalledModDetailModal({
       footer={
         mod && (
           <>
+            {update && (
+              <Button
+                variant="primary"
+                onClick={onUpdate}
+                disabled={disabled || busy}
+                title={disabled ? disabledReason : undefined}
+              >
+                {busy ? "Working…" : `Update to v${update.latestVersion}`}
+              </Button>
+            )}
             <Button onClick={onToggleEnabled} disabled={disabled || busy} title={disabled ? disabledReason : undefined}>
               {busy ? "Working…" : mod.enabled ? "Disable" : "Enable"}
             </Button>

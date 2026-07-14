@@ -63,6 +63,25 @@ body,
   background: #26262e;
 }
 
+/* Sits directly under the Settings tab — an external link out to the community Discord, in
+   Discord's Blurple, distinct from the page tabs above it. */
+.cm-tabs__discord {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #5865f2;
+}
+.cm-tabs__discord:hover {
+  background: #5865f2;
+  color: #fff;
+}
+.cm-tabs__discord-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
 .cm-app__content {
   flex: 1;
   min-height: 0;
@@ -134,4 +153,17 @@ body,
   color: #cfe0ff;
   font-size: 0.85rem;
   text-align: center;
+}
+.cm-global-banner__action {
+  border: none;
+  background: #3a5a8f;
+  color: #e6e6e6;
+  border-radius: 4px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.cm-global-banner__action:disabled {
+  cursor: default;
+  opacity: 0.8;
 }

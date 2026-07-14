@@ -7,4 +7,7 @@ export interface SnapshotPort {
   capture(gameDir: string, plan: SnapshotPlan): Promise<void>;
   restore(gameDir: string, timestamp: string): Promise<void>;
   list(): Promise<string[]>;
+  /** Deletes all but the `keep` most recent snapshots. Snapshot ids sort chronologically, so
+   * "most recent" is the lexicographic tail — no per-dir mtime lookup needed. */
+  prune(keep: number): Promise<void>;
 }

@@ -32,6 +32,7 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_persisted_scope::init())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         // Restores window size/position/maximized/monitor on the next launch and saves on
         // move/resize/close, keyed by window label — no app-side code needed.
         .plugin(tauri_plugin_window_state::Builder::default().build())

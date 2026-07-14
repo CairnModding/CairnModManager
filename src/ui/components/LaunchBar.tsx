@@ -23,6 +23,7 @@ export function LaunchBar() {
 
   return (
     <header className="cm-launchbar">
+      <img src="/cairn-logo.png" alt="" className="cm-launchbar__logo" />
       <span className="cm-launchbar__title">Cairn Mod Manager</span>
       {error && <span className="cm-launchbar__error">{error}</span>}
       {gameRunning ? (

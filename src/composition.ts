@@ -1,3 +1,4 @@
+import { createAppUpdateAdapter } from "./infra/tauri/appUpdateAdapter";
 import { createArchiveAdapter } from "./infra/tauri/archiveAdapter";
 import { createDeepLinkAdapter } from "./infra/tauri/deepLinkAdapter";
 import { createProgressAdapter } from "./infra/tauri/events";
@@ -34,6 +35,7 @@ export function createAppContainer() {
   const platform = createPlatformAdapter();
   const progress = createProgressAdapter();
   const snapshotPort = createSnapshotAdapter(fs);
+  const appUpdate = createAppUpdateAdapter();
 
   const processLock = createProcessLockService(process_);
   const gameDetection = createGameDetectionService(fs, platform);
@@ -79,6 +81,7 @@ export function createAppContainer() {
     configEditor,
     backupService,
     nxmHandoff,
+    appUpdate,
     loadSources,
   };
 }

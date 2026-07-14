@@ -34,4 +34,5 @@ export interface Mod {
   readonly downloadCount?: number;
   readonly endorsementCount?: number;
   readonly pictureUrl?: string;
+  readonly updatedAt?: string;
 }

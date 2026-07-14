@@ -55,5 +55,14 @@ export function createSnapshotAdapter(fs: FileSystemPort): SnapshotPort {
       if (!(await fs.exists(root))) return [];
       return fs.readDir(root);
     },
+
+    async prune(keep: number): Promise<void> {
+      const root = await backupsRoot();
+      if (!(await fs.exists(root))) return;
+      const newestFirst = (await fs.readDir(root)).sort().reverse();
+      for (const dir of newestFirst.slice(keep)) {
+        await fs.remove(await join(root, dir));
+      }
+    },
   };
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { open as openFolderDialog } from "@tauri-apps/plugin-dialog";
+import { getVersion } from "@tauri-apps/api/app";
 import { Panel } from "../primitives/Panel";
 import { Field } from "../primitives/Field";
 import { Button } from "../primitives/Button";
@@ -7,10 +8,11 @@ import { Badge } from "../primitives/Badge";
 import { useContainer } from "../../state/ContainerContext";
 import { useSettingsStore } from "../../state/settingsStore";
 import { useGameRunning } from "../../state/gameRunningStore";
+import { useAppUpdateStore } from "../../state/appUpdateStore";
 import { useAsyncAction } from "../../hooks/useAsyncAction";
 import "./settings.css";
 
-type SettingsAction = "detect" | "browse" | "melonloader" | "apikey";
+type SettingsAction = "detect" | "browse" | "melonloader" | "apikey" | "update-check" | "update-install";
 
 export function Settings() {
   const container = useContainer();
@@ -19,11 +21,21 @@ export function Settings() {
   const { run, isBusy } = useAsyncAction<SettingsAction>();
   const [apiKeyDraft, setApiKeyDraft] = useState("");
   const [melonLoaderInstalled, setMelonLoaderInstalled] = useState<boolean>();
+  const [appVersion, setAppVersion] = useState<string>();
+  const appUpdateStatus = useAppUpdateStore((s) => s.status);
+  const appUpdateInfo = useAppUpdateStore((s) => s.info);
+  const appUpdateFraction = useAppUpdateStore((s) => s.fraction);
+  const checkAppUpdate = useAppUpdateStore((s) => s.checkNow);
+  const installAppUpdate = useAppUpdateStore((s) => s.installNow);
 
   useEffect(() => {
     if (!settings?.gameDir) return;
     container.melonLoader.isInstalled(settings.gameDir).then(setMelonLoaderInstalled);
   }, [container, settings?.gameDir]);
+
+  useEffect(() => {
+    getVersion().then(setAppVersion);
+  }, []);
 
   useEffect(() => {
     setApiKeyDraft(settings?.nexusApiKey ?? "");
@@ -54,6 +66,26 @@ export function Settings() {
 
   function handleSaveApiKey() {
     return run("apikey", () => setNexusApiKey(container.settingsService, apiKeyDraft));
+  }
+
+  function handleCheckForUpdates() {
+    return run("update-check", async () => {
+      await checkAppUpdate(container.appUpdate);
+      if (useAppUpdateStore.getState().status === "error") {
+        throw new Error("Couldn't check for updates. Try again later.");
+      }
+    });
+  }
+
+  function handleRestartAndUpdate() {
+    return run("update-install", async () => {
+      await installAppUpdate(container.appUpdate);
+      if (useAppUpdateStore.getState().status === "ready") {
+        await container.appUpdate.relaunch();
+      } else {
+        throw new Error("Couldn't install the update. Try again later.");
+      }
+    });
   }
 
   return (
@@ -123,6 +155,24 @@ export function Settings() {
           browse and search freely; downloading requires clicking "Mod Manager Download" on the
           mod's Nexus page, which this app receives via the <code>nxm://</code> link handler.
         </p>
+      </Panel>
+
+      <Panel title="App">
+        <div className="cm-settings__status-row">
+          <span className="cm-settings__hint">Version {appVersion ?? "…"}</span>
+          {appUpdateStatus === "available" && <Badge variant="info">Update available</Badge>}
+        </div>
+        {appUpdateStatus === "available" || appUpdateStatus === "downloading" ? (
+          <Button variant="primary" onClick={handleRestartAndUpdate} disabled={isBusy("update-install")}>
+            {appUpdateStatus === "downloading"
+              ? `Downloading… ${appUpdateFraction !== undefined ? Math.round(appUpdateFraction * 100) : 0}%`
+              : `Restart & update to v${appUpdateInfo?.version}`}
+          </Button>
+        ) : (
+          <Button onClick={handleCheckForUpdates} disabled={isBusy("update-check")}>
+            {isBusy("update-check") ? "Checking…" : "Check for updates"}
+          </Button>
+        )}
       </Panel>
     </div>
   );

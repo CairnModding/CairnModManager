@@ -1,5 +1,6 @@
 import type { MouseEvent } from "react";
 import type { InstalledMod } from "../../domain/installedMod";
+import type { AvailableUpdate } from "../../domain/computeUpdateSet";
 import { Button } from "../primitives/Button";
 import { StatusDot } from "../primitives/StatusDot";
 import { useModDetail } from "../../state/useModSources";
@@ -7,19 +8,23 @@ import "./components.css";
 
 export function InstalledModCard({
   mod,
+  update,
   busy,
   disabled,
   disabledReason,
   onToggleEnabled,
   onUninstall,
+  onUpdate,
   onOpenDetails,
 }: {
   mod: InstalledMod;
+  update?: AvailableUpdate;
   busy: boolean;
   disabled: boolean;
   disabledReason?: string;
   onToggleEnabled: () => void;
   onUninstall: () => void;
+  onUpdate: () => void;
   onOpenDetails: () => void;
 }) {
   const unmanaged = mod.ref.source === "unmanaged";
@@ -47,9 +52,15 @@ export function InstalledModCard({
         {source?.summary && <p className="cm-mod-card__summary">{source.summary}</p>}
         <div className="cm-list-row__meta">
           <span>{unmanaged ? "Manually installed" : `v${mod.version}`}</span>
+          {update && <span className="cm-installed-card__update-hint">update to v{update.latestVersion}</span>}
         </div>
       </div>
       <div className="cm-list-row__actions" title={disabled ? disabledReason : undefined}>
+        {update && (
+          <Button variant="primary" onClick={stopAnd(onUpdate)} disabled={disabled || busy}>
+            {busy ? "Working…" : `Update to v${update.latestVersion}`}
+          </Button>
+        )}
         <Button onClick={stopAnd(onToggleEnabled)} disabled={disabled || busy}>
           {busy ? "Working…" : mod.enabled ? "Disable" : "Enable"}
         </Button>

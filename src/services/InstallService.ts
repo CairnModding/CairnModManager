@@ -16,6 +16,16 @@ import type { ModSource } from "../sources/modSource";
 import type { NxmHandoffService } from "./NxmHandoffService";
 import type { ProcessLockService } from "./ProcessLockService";
 
+/** Pre-install snapshots kept in `$APPDATA/backups` before the oldest are pruned. Enough to undo
+ * a handful of recent installs without letting the folder grow without bound. */
+const MAX_KEPT_SNAPSHOTS = 20;
+
+/** `modRefKey` is `source:id`; the colon and any source-native punctuation are illegal in a
+ * Windows directory name, so flatten anything outside a safe set to `_` for use as a dir segment. */
+function safeSegment(value: string): string {
+  return value.replace(/[^a-zA-Z0-9._-]/g, "_");
+}
+
 export class ModConflictError extends Error {
   constructor(public readonly conflicts: readonly FileConflict[]) {
     super(`Install would overwrite files owned by another mod: ${conflicts.map((c) => c.path).join(", ")}`);
@@ -28,9 +38,27 @@ export class UnresolvedDependenciesError extends Error {
     public readonly missing: readonly { id: string }[],
     public readonly unsatisfied: readonly { id: string; required: string; installed: string }[],
   ) {
-    super("Dependencies could not be resolved");
+    super(unresolvedDependenciesMessage(missing, unsatisfied));
     this.name = "UnresolvedDependenciesError";
   }
+}
+
+function unresolvedDependenciesMessage(
+  missing: readonly { id: string }[],
+  unsatisfied: readonly { id: string; required: string; installed: string }[],
+): string {
+  const parts: string[] = [];
+  if (missing.length > 0) {
+    parts.push(`missing ${missing.map((m) => m.id).join(", ")}`);
+  }
+  if (unsatisfied.length > 0) {
+    parts.push(
+      `out of date ${unsatisfied
+        .map((u) => `${u.id} (need ${u.required}, have ${u.installed})`)
+        .join(", ")}`,
+    );
+  }
+  return `Can't install — unmet dependencies: ${parts.join("; ")}.`;
 }
 
 export interface InstallService {
@@ -68,6 +96,8 @@ export function createInstallService(
     gameDir: string,
     profile: Profile,
     taskId: string,
+    snapshotId: string,
+    onCaptured: (snapshotId: string) => void,
     nxmRef?: NxmRef,
     label?: string,
   ): Promise<InstalledMod> {
@@ -109,7 +139,10 @@ export function createInstallService(
     // Brand-new files have no lock to fight — only overwriting an already-installed mod's files
     // (an update/reinstall) can hit one a running game holds open, so only gate that case.
     if (existing.size > 0) await processLock.assertGameNotRunning();
-    await snapshot.capture(gameDir, planSnapshot(taskId, planned, existing));
+    await snapshot.capture(gameDir, planSnapshot(snapshotId, planned, existing));
+    // Recorded only after a successful capture, so a rollback never tries to restore a snapshot
+    // that was never written.
+    onCaptured(snapshotId);
 
     progress.emit({ taskId, phase: "installing", fraction: 0 });
     for (let i = 0; i < planned.length; i++) {
@@ -150,20 +183,48 @@ export function createInstallService(
         );
       }
 
+      // All mods in one install() share a batch stamp so their snapshots sort together and stay
+      // unique per mod — the id doubles as both the sort key for pruning and the rollback handle.
+      const batchStamp = new Date().toISOString().replace(/[:.]/g, "-");
       const installed: InstalledMod[] = [];
-      for (const item of plan.toInstall) {
-        const isPrimary = modRefEquals(item.version.modRef, version.modRef);
-        installed.push(
-          await installSingle(
-            source,
-            item.version,
-            gameDir,
-            profile,
-            taskId,
-            isPrimary ? nxmRef : undefined,
-            isPrimary ? label : undefined,
-          ),
-        );
+      const captured: string[] = [];
+      try {
+        for (const item of plan.toInstall) {
+          const isPrimary = modRefEquals(item.version.modRef, version.modRef);
+          const snapshotId = `${batchStamp}__${safeSegment(modRefKey(item.version.modRef))}`;
+          installed.push(
+            await installSingle(
+              source,
+              item.version,
+              gameDir,
+              profile,
+              taskId,
+              snapshotId,
+              (id) => captured.push(id),
+              isPrimary ? nxmRef : undefined,
+              isPrimary ? label : undefined,
+            ),
+          );
+        }
+      } catch (err) {
+        // A dependency chain that fails partway leaves the mods installed before the failure on
+        // disk with no profile record. Restore each captured snapshot newest-first so the game dir
+        // returns to its pre-install state instead of accumulating orphaned files.
+        for (const id of [...captured].reverse()) {
+          try {
+            await snapshot.restore(gameDir, id);
+          } catch {
+            // Best-effort: a restore failure must not mask the original install error.
+          }
+        }
+        throw err;
+      }
+
+      // Housekeeping only — a failure here must not fail an otherwise-successful install.
+      try {
+        await snapshot.prune(MAX_KEPT_SNAPSHOTS);
+      } catch {
+        /* ignore */
       }
 
       progress.emit({ taskId, phase: "done", message: label ?? version.modRef.id });

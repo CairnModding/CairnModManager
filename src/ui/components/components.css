@@ -7,6 +7,12 @@
   background: #17171b;
   border-bottom: 1px solid #2c2c34;
 }
+.cm-launchbar__logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #ffffff;
+}
 .cm-launchbar__title {
   font-size: 0.9rem;
   font-weight: 600;
@@ -56,6 +62,9 @@
 .cm-list-row__actions {
   display: flex;
   gap: 0.5rem;
+}
+.cm-installed-card__update-hint {
+  color: #7aa5ff;
 }
 
 .cm-mod-card__thumb {

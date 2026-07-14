@@ -24,10 +24,9 @@ export interface MelonLoaderService {
   latestAvailableVersion(): Promise<string>;
   install(gameDir: string, taskId: string): Promise<{ version: string }>;
   /**
-   * Enable/disable strategy — MelonLoader is commonly understood to skip non-`.dll` files in
-   * `Mods/`, so this renames the extension. NOT YET RUNTIME-VERIFIED against the installed
-   * MelonLoader build (see plan's open question); kept as this one function so verification
-   * only changes one place.
+   * Enable/disable strategy — MelonLoader skips non-`.dll` files in `Mods/`, so this renames the
+   * extension (runtime-verified against the installed build). Kept as this one function so the
+   * convention lives in a single place.
    */
   disableModFile(gameDir: string, relativeDllPath: string): Promise<void>;
   enableModFile(gameDir: string, relativeDisabledPath: string): Promise<void>;

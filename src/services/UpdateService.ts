@@ -14,6 +14,7 @@ export interface UpdateService {
     gameDir: string,
     profile: Profile,
     taskId: string,
+    label?: string,
   ): Promise<InstalledMod[]>;
 }
 
@@ -30,7 +31,7 @@ export function createUpdateService(installService: InstallService): UpdateServi
       return computeUpdateSet(profile, catalog);
     },
 
-    async applyUpdate(update, sources, gameDir, profile, taskId): Promise<InstalledMod[]> {
+    async applyUpdate(update, sources, gameDir, profile, taskId, label): Promise<InstalledMod[]> {
       const source = sources.get(update.modRef.source);
       if (!source) throw new Error(`No source registered for ${update.modRef.source}`);
 
@@ -38,10 +39,10 @@ export function createUpdateService(installService: InstallService): UpdateServi
       const target = versions.find((v) => v.version === update.latestVersion);
       if (!target) throw new Error(`Version ${update.latestVersion} disappeared from ${update.modRef.source}`);
 
-      // Known gap: this overwrites files the new version still ships but doesn't clean up
-      // files the OLD version had that the new one dropped. Fine while releases only add/change
-      // files; revisit if a mod ever removes a file across versions.
-      return installService.install(source, target, gameDir, profile, taskId);
+      // Writes the new version's file set. Files the OLD version shipped that this one drops are
+      // pruned by the caller, which holds the pre-update file list to diff against (see the update
+      // handler in the Installed Mods page).
+      return installService.install(source, target, gameDir, profile, taskId, undefined, label);
     },
   };
 }

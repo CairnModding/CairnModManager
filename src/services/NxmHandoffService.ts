@@ -19,6 +19,12 @@ export interface NxmHandoffService {
  * otherwise it's unsolicited and goes to `onUnsolicited` listeners instead. Without this
  * single-dispatch point, a second independent subscription (e.g. for unsolicited links) would
  * double-handle every ref that arrives while a `requestDownload()` is also pending. */
+/** How long a browser round trip may sit pending before it's abandoned. Without this a user who
+ * closes the Nexus tab (or never clicks "Mod Manager Download") leaves the install stuck in
+ * `awaiting-browser` forever AND leaves a dead resolver at the head of the queue that swallows the
+ * next arriving link — even one for a different mod. */
+const HANDOFF_TIMEOUT_MS = 5 * 60_000;
+
 export function createNxmHandoffService(deepLink: DeepLinkPort, process: ProcessPort): NxmHandoffService {
   const pendingResolvers: Array<(ref: NxmRef) => void> = [];
   const unsolicitedHandlers = new Set<(ref: NxmRef) => void>();
@@ -31,8 +37,26 @@ export function createNxmHandoffService(deepLink: DeepLinkPort, process: Process
 
   return {
     requestDownload(webUrl: string): Promise<NxmRef> {
-      return new Promise((resolve) => {
-        pendingResolvers.push(resolve);
+      return new Promise((resolve, reject) => {
+        let settled = false;
+        const entry = (ref: NxmRef) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          resolve(ref);
+        };
+        pendingResolvers.push(entry);
+        const timer = setTimeout(() => {
+          if (settled) return;
+          settled = true;
+          const i = pendingResolvers.indexOf(entry);
+          if (i >= 0) pendingResolvers.splice(i, 1);
+          reject(
+            new Error(
+              'Timed out waiting for the Nexus "Mod Manager Download" click. Start the install again when you\'re ready.',
+            ),
+          );
+        }, HANDOFF_TIMEOUT_MS);
         void process.openExternalUrl(webUrl);
       });
     },

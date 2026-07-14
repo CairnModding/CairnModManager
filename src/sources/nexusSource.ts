@@ -21,6 +21,7 @@ interface NexusModDto {
   readonly picture_url: string | null;
   readonly endorsement_count: number;
   readonly mod_unique_downloads: number;
+  readonly updated_timestamp: number;
   /** False for a reserved-but-never-filled-out mod page (blank name/summary/picture, no files) —
    * `latest_updated.json` includes these alongside real releases. */
   readonly available?: boolean;
@@ -101,6 +102,7 @@ function toMod(dto: NexusModDto): Mod {
     downloadCount: dto.mod_unique_downloads,
     endorsementCount: dto.endorsement_count,
     pictureUrl: dto.picture_url ?? undefined,
+    updatedAt: new Date(dto.updated_timestamp * 1000).toISOString(),
   };
 }
 
