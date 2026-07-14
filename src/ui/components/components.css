@@ -1,0 +1,288 @@
+.cm-launchbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  padding: 0.6rem 1.25rem;
+  background: #17171b;
+  border-bottom: 1px solid #2c2c34;
+}
+.cm-launchbar__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e6e6e6;
+}
+.cm-launchbar__error {
+  font-size: 0.8rem;
+  color: #f0a0a0;
+}
+.cm-launchbar__button {
+  margin-left: auto;
+}
+.cm-launchbar__button--running:disabled {
+  opacity: 1;
+  color: #5fbf6f;
+}
+
+/* Shared row shape for any clickable list entry (mod cards on Browse, installed mods) — lifted
+   out so both lists read as one consistent list language instead of two different visual styles. */
+.cm-list-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid #2c2c34;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+.cm-list-row:hover {
+  background: #1e1e24;
+}
+.cm-list-row__name {
+  margin: 0;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cm-list-row__meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: #6a6a76;
+}
+.cm-list-row__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cm-mod-card__thumb {
+  align-self: stretch;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  max-width: 160px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.cm-mod-card__thumb--placeholder {
+  background: #232329;
+  border: 1px dashed #3a3a42;
+}
+.cm-mod-card__summary {
+  margin: 0.2rem 0;
+  font-size: 0.8rem;
+  color: #a0a0aa;
+}
+.cm-mod-card__installed {
+  font-size: 0.8rem;
+  color: #5fbf6f;
+}
+
+.cm-mod-card__stats {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  color: #7a7a86;
+}
+.cm-download-row__status {
+  font-size: 0.75rem;
+  color: #7a7a86;
+  white-space: nowrap;
+}
+.cm-download-row--done .cm-download-row__status {
+  color: #8fe0a5;
+}
+.cm-download-row--error .cm-download-row__status {
+  color: #f0a0a0;
+}
+
+.cm-dependency-list--loading {
+  font-style: italic;
+}
+
+.cm-mod-detail__image {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+.cm-mod-detail__requires + .cm-bbcode {
+  margin-top: 0.5rem;
+}
+.cm-mod-detail__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #8a8a94;
+  margin-bottom: 0.4rem;
+}
+.cm-mod-detail__meta-left,
+.cm-mod-detail__meta-right {
+  display: flex;
+  gap: 1rem;
+}
+.cm-mod-detail__requires {
+  font-size: 0.72rem;
+  color: #7a7a86;
+}
+.cm-mod-detail__changelog {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #2c2c34;
+}
+.cm-mod-detail__changelog-title {
+  margin: 0 0 0.4rem 0;
+  font-size: 0.85rem;
+  color: #a0a0aa;
+}
+.cm-mod-detail__changelog-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #b8b8c0;
+  white-space: pre-wrap;
+}
+
+.cm-installed-detail__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #a0a0aa;
+  margin-bottom: 1rem;
+}
+.cm-installed-detail__settings-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #2c2c34;
+}
+.cm-installed-detail__hint {
+  font-size: 0.85rem;
+  color: #6a6a76;
+}
+
+.cm-installed-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.cm-progress-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+}
+.cm-progress-meter__label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #a0a0aa;
+}
+.cm-progress-meter__icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+.cm-progress-meter--done {
+  background: #1c3324;
+  border: 1px solid #2f6b40;
+}
+.cm-progress-meter--done .cm-progress-meter__label {
+  color: #8fe0a5;
+}
+.cm-progress-meter--handoff {
+  background: #1e2a3f;
+  border: 1px solid #3a5a8f;
+}
+.cm-progress-meter--handoff .cm-progress-meter__label {
+  color: #cfe0ff;
+}
+.cm-progress-meter__link {
+  font-size: 0.75rem;
+  color: #7aa5ff;
+}
+.cm-progress-meter--error {
+  background: #2f1a1a;
+  border: 1px solid #6a2c2c;
+}
+.cm-progress-meter--error .cm-progress-meter__label {
+  color: #f0a0a0;
+}
+
+.cm-log-pane {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: #0b0b0e;
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+}
+.cm-log-pane__line {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.cm-log-pane__line--error {
+  color: #f0a0a0;
+}
+
+.cm-log-pane__empty {
+  color: #5a5a64;
+  font-style: italic;
+}
+
+.cm-bbcode {
+  color: #d0d0d6;
+  font-size: 0.88rem;
+}
+.cm-bbcode__paragraph {
+  margin: 0 0 0.75rem 0;
+}
+.cm-bbcode__heading {
+  margin: 0 0 0.4rem 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e6e6e6;
+}
+.cm-bbcode__list {
+  margin: 0 0 0.75rem 0;
+  padding-left: 1.25rem;
+}
+.cm-bbcode__list li {
+  margin-bottom: 0.3rem;
+}
+.cm-bbcode a {
+  color: #7aa5ff;
+  cursor: pointer;
+}
+.cm-bbcode a:hover {
+  text-decoration: underline;
+}
+
+.cm-preference-field {
+  display: grid;
+  grid-template-columns: 1fr minmax(100px, 220px) auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.35rem 0;
+}
+.cm-preference-field__key {
+  font-size: 0.8rem;
+  color: #a0a0aa;
+}
+.cm-preference-field__input {
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #3a3a42;
+  background: #101014;
+  color: #e6e6e6;
+}

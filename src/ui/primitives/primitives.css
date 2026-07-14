@@ -1,0 +1,301 @@
+.cm-button {
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 80ms ease;
+}
+.cm-button--primary {
+  background: #3a6ff7;
+  color: white;
+}
+.cm-button--primary:hover:not(:disabled) {
+  background: #558bff;
+}
+.cm-button--secondary {
+  background: #2a2a30;
+  color: #e6e6e6;
+  border-color: #3a3a42;
+}
+.cm-button--secondary:hover:not(:disabled) {
+  background: #35353d;
+  border-color: #4a4a54;
+}
+.cm-button--danger {
+  background: #c0392b;
+  color: white;
+}
+.cm-button--danger:hover:not(:disabled) {
+  background: #d94635;
+}
+.cm-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.cm-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cm-panel {
+  background: #1c1c20;
+  border: 1px solid #2c2c34;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.cm-panel__title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: #e6e6e6;
+}
+.cm-panel--fill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.cm-panel__body--fill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* LogPane manages its own internal scroll, so this is a no-op there; for plain child lists
+     (mod cards, installed cards, preference rows) this is what actually makes them scroll
+     internally instead of the whole page. */
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-right: -0.5rem;
+}
+
+.cm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+.cm-field__label {
+  font-size: 0.8rem;
+  color: #a0a0aa;
+}
+.cm-field__input {
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #3a3a42;
+  background: #101014;
+  color: #e6e6e6;
+  transition: border-color 120ms ease;
+}
+.cm-field__input:hover {
+  border-color: #4a4a54;
+}
+.cm-field__input:focus {
+  outline: none;
+  border-color: #3a6ff7;
+}
+
+.cm-progress {
+  height: 6px;
+  border-radius: 4px;
+  background: #2a2a30;
+  overflow: hidden;
+}
+.cm-progress__fill {
+  height: 100%;
+  background: #3a6ff7;
+  transition: width 150ms ease;
+}
+.cm-progress__fill--indeterminate {
+  width: 40%;
+  animation: cm-progress-indeterminate 1.2s ease-in-out infinite;
+}
+@keyframes cm-progress-indeterminate {
+  0% {
+    margin-left: 0%;
+  }
+  50% {
+    margin-left: 60%;
+  }
+  100% {
+    margin-left: 0%;
+  }
+}
+
+.cm-empty-state {
+  color: #6a6a76;
+  font-size: 0.9rem;
+}
+
+.cm-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.cm-status-dot--on {
+  background: #5fbf6f;
+  box-shadow: 0 0 6px #5fbf6f80;
+}
+.cm-status-dot--off {
+  background: #4a4a52;
+}
+
+.cm-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.cm-badge--neutral {
+  background: #2a2a30;
+  color: #a0a0aa;
+}
+.cm-badge--info {
+  background: #1e2a3f;
+  color: #cfe0ff;
+}
+.cm-badge--success {
+  background: #1c3324;
+  color: #8fe0a5;
+}
+.cm-badge--error {
+  background: #2f1a1a;
+  color: #f0a0a0;
+}
+.cm-badge--warning {
+  background: #362a10;
+  color: #f0c97a;
+}
+
+.cm-toast-stack {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+  z-index: 200;
+  width: min(360px, calc(100vw - 2.5rem));
+}
+.cm-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  font-size: 0.85rem;
+}
+.cm-toast--error {
+  background: #2f1a1a;
+  border: 1px solid #6a2c2c;
+  color: #f0a0a0;
+}
+.cm-toast--info {
+  background: #1e2a3f;
+  border: 1px solid #3a5a8f;
+  color: #cfe0ff;
+}
+.cm-toast__message {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.cm-toast__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.cm-toast__action {
+  background: transparent;
+  border: 1px solid currentColor;
+  color: inherit;
+  border-radius: 5px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.cm-toast__action:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.cm-toast__dismiss {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.15rem;
+  opacity: 0.7;
+}
+.cm-toast__dismiss:hover {
+  opacity: 1;
+}
+
+.cm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.cm-modal {
+  width: min(560px, calc(100vw - 3rem));
+  max-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  background: #1c1c20;
+  border: 1px solid #2c2c34;
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+.cm-modal__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #2c2c34;
+}
+.cm-modal__title {
+  margin: 0;
+  font-size: 1.05rem;
+  flex: 1;
+}
+.cm-modal__close {
+  background: transparent;
+  border: none;
+  color: #a0a0aa;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+.cm-modal__close:hover {
+  background: #2a2a30;
+  color: #e6e6e6;
+}
+.cm-modal__body {
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+.cm-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #2c2c34;
+}

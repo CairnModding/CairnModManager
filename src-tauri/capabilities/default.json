@@ -1,0 +1,48 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [{ "url": "steam:*" }, { "url": "nxm:*" }, { "url": "https://*" }]
+    },
+    "fs:default",
+    "fs:allow-read-file",
+    "fs:allow-read-text-file",
+    "fs:allow-write-file",
+    "fs:allow-write-text-file",
+    "fs:allow-read-dir",
+    "fs:allow-exists",
+    "fs:allow-stat",
+    "fs:allow-mkdir",
+    "fs:allow-remove",
+    "fs:allow-copy-file",
+    "fs:allow-rename",
+    "fs:allow-watch",
+    {
+      "identifier": "fs:scope",
+      "allow": [{ "path": "$APPDATA/**" }, { "path": "$APPCONFIG/**" }]
+    },
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "https://api.nexusmods.com/*" },
+        { "url": "https://*.nexusmods.com/*" },
+        { "url": "https://*.nexus-cdn.com/*" },
+        { "url": "https://api.github.com/*" },
+        { "url": "https://github.com/*" },
+        { "url": "https://objects.githubusercontent.com/*" }
+      ]
+    },
+    "dialog:default",
+    "shell:allow-open",
+    "deep-link:default",
+    "store:default",
+    "process:default",
+    "window-state:default"
+  ]
+}

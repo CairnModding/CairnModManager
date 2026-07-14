@@ -1,0 +1,4 @@
+[build]
+# D: is chronically low on space; Cargo's build cache is large and fully regenerable, so it
+# lives on P: instead.
+target-dir = "P:/dev-cache/cairn-manager-target"

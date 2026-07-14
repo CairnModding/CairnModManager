@@ -1,0 +1,137 @@
+:root {
+  color-scheme: dark;
+  background: #0e0e11;
+  color: #e6e6e6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+.cm-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.cm-app__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.cm-tabs {
+  display: flex;
+  flex-direction: column;
+  width: 160px;
+  flex-shrink: 0;
+  border-right: 1px solid #2c2c34;
+  padding: 1rem 0.5rem;
+  gap: 0.25rem;
+}
+
+.cm-tabs__item {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #a0a0aa;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.cm-tabs__item:hover {
+  background: #1c1c22;
+  color: #cfcfd6;
+}
+
+.cm-tabs__item--active {
+  background: #22222a;
+  color: #e6e6e6;
+}
+.cm-tabs__item--active:hover {
+  background: #26262e;
+}
+
+.cm-app__content {
+  flex: 1;
+  min-height: 0;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Every page except the logs renders inside this — caps reading/form width instead of stretching
+   list rows and settings fields edge-to-edge across the whole window. */
+.cm-app__content--narrow {
+  max-width: 760px;
+}
+
+/* Shared shape for pages with a fixed header (search/filter controls) above a scrollable list —
+   the list scrolls internally instead of the whole page, so the header never scrolls out of view. */
+.cm-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* For a page's empty/blocked state — one panel centered in the content pane instead of the usual
+   header+scrollable-list shape. */
+.cm-page--centered {
+  align-items: center;
+  justify-content: center;
+}
+.cm-page--centered .cm-panel {
+  max-width: 420px;
+}
+
+/* Small horizontal tab switcher inside a page (e.g. Log page's Game/Manager log toggle) — distinct
+   from .cm-tabs, the vertical sidebar nav. */
+.cm-subtabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+}
+.cm-subtabs__item {
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  border: none;
+  background: #1c1c20;
+  color: #a0a0aa;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+.cm-subtabs__item:hover {
+  background: #22222a;
+  color: #cfcfd6;
+}
+.cm-subtabs__item--active {
+  background: #2a2a30;
+  color: #e6e6e6;
+}
+
+/* Full-bleed global status strip — spans the whole window edge to edge, sits directly under the
+   launch bar, no inset from the content pane's padding/max-width. */
+.cm-global-banner {
+  flex-shrink: 0;
+  padding: 0.5rem 1.25rem;
+  background: #1e2a3f;
+  border-bottom: 1px solid #3a5a8f;
+  color: #cfe0ff;
+  font-size: 0.85rem;
+  text-align: center;
+}
