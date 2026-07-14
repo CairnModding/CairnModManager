@@ -1,0 +1,27 @@
+name: Announce
+
+# Fires when a release is PUBLISHED (not when the tag push drafts it) — so the Discord post goes
+# out only once the release is live and its download links resolve.
+on:
+  release:
+    types: [published]
+
+jobs:
+  discord:
+    runs-on: ubuntu-latest
+    env:
+      WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_MANAGER }}
+      NAME: ${{ github.event.release.name }}
+      BODY: ${{ github.event.release.body }}
+      URL: ${{ github.event.release.html_url }}
+    steps:
+      - name: Post release to Discord
+        run: |
+          [ -z "$WEBHOOK" ] && { echo "no DISCORD_WEBHOOK_MANAGER secret — skipping"; exit 0; }
+          BODY_JSON=$(jq -n \
+            --arg title "$NAME" \
+            --arg url "$URL" \
+            --arg desc "$BODY" \
+            --argjson color 5793266 \
+            '{embeds: [{title: $title, url: $url, color: $color, description: $desc}]}')
+          curl -fsSL -X POST -H "Content-Type: application/json" -d "$BODY_JSON" "$WEBHOOK"
