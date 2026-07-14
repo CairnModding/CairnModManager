@@ -1,0 +1,59 @@
+name: Release
+
+# Windows build + GitHub release — ONLY on a version tag, never on every commit/PR/merge.
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  parse:
+    name: Verify tag matches tauri.conf.json version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.p.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: p
+        run: |
+          TAG="${{ github.ref_name }}"
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            VERSION=$(jq -r '.version' src-tauri/tauri.conf.json)
+          else
+            VERSION="${TAG#v}"
+            CONF=$(jq -r '.version' src-tauri/tauri.conf.json)
+            [ "$VERSION" = "$CONF" ] || { echo "::error::tag v$VERSION != tauri.conf.json version $CONF"; exit 1; }
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+  release:
+    name: Build + release
+    needs: parse
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v${{ needs.parse.outputs.version }}
+          releaseName: "Cairn Mod Manager v${{ needs.parse.outputs.version }}"
+          releaseDraft: true
+          prerelease: false
